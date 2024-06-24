@@ -1,8 +1,6 @@
 import random
 import torch
 import numpy as np
-import pandas as pd
-from Bio import SeqIO
 
 def same_seed(seed): 
     '''Fixes random number generator seeds for reproducibility.'''

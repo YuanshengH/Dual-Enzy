@@ -54,7 +54,6 @@ def main(args):
                                 mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batchsize, collate_fn=collate_substrate, shuffle=True, num_workers=4, pin_memory=True)
 
-
     valid_dataset = SubstrateDataset(reactant_id=valid_df['reactant_id'].values.tolist(), product_id=valid_df['product_id'].values.tolist(),
                                 reaction_id=valid_df['reaction_id'].values.tolist(),uni_id=valid_df['Entry'].values.tolist(), activity=valid_df['Label'].values.tolist(),
                                 mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
@@ -83,8 +82,6 @@ def main(args):
             reaction_id, label = reaction_id.to(device), label.to(device)
             reactant_emb, enzyme_emb, product_emb = model(esm_emb=esm_embedding, reactant=r_embedding, product=p_embedding, 
                                                         esm_padding_mask=esm_padding_mask, reactant_padding_mask=r_padding_mask, product_padding_mask=p_padding_mask)
-
-
             rxn_loss, reaction_loss = ReactionLoss(reactant_emb, enzyme_emb, product_emb, reaction_id, label,)
             loss = rxn_loss + reaction_loss
             optimizer.zero_grad()

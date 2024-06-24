@@ -30,7 +30,6 @@ def main(args):
     print(args)
     same_seed(args.seed)
     df = pd.read_csv(args.data_path)
-
     rxntoi = {r:idx for idx, r in enumerate(sorted(list(set(df['reaction'].values.tolist()))))}
     ectoi = {ec:idx for idx, ec in enumerate(sorted(list(set(df['EC'].values.tolist()))))}
     with open(args.unimol_dict, 'rb') as f:

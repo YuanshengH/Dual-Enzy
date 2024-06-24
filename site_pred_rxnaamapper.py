@@ -50,7 +50,6 @@ def main():
         rxn_list = [i.split('|')[0] for i in rxn_list]
         rxn_list = [j for i in rxn_list for j in i.split('.')]
         rxn_list = sorted(list(set(rxn_list)))
-
         itosmiles = set()
         for s in rxn_list:
             itosmiles.add(s)
@@ -89,7 +88,6 @@ def main():
     model.eval()
     all_preds = []
     all_labels = []
-    # for head in range(8):
     for head in [4]:
         with torch.no_grad():
             for batch in tqdm(dataloader):
@@ -101,7 +99,6 @@ def main():
                 enzyme_self_attn = enzyme_self_attn[:,:,1:-1,1:-1]
                 pred_site_onehot = torch.zeros(site.size())
                 pred_site_onehot[(torch.sum(enzyme_self_attn[:,head],dim=1)>0.10)] = 1
-
                 site = site.view(-1)
                 pred_site_onehot = pred_site_onehot.view(-1)
                 mask = (site!=-1)

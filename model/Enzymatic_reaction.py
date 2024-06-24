@@ -4,7 +4,6 @@ import copy
 import torch.nn.functional as F
 import numpy as np
 from torch import nn
-from typing import Dict, List, Optional, Tuple, Union
 from collections.abc import Sequence
 
 def meanpooling(node_emb, mask):

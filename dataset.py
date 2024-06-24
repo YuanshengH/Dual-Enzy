@@ -199,7 +199,6 @@ class SubstrateDataset(Dataset):
         esm_embedding = pickle.loads(self.seq_txn.get(uni_id.encode()))
         return r_embedding, p_embedding, esm_embedding, self.reaction_id[idx], self.activity[idx], uni_id
     
-
 class RXNMapperDataset(Dataset):
     def __init__(self, reactant_id, product_id, site_label, ec, uni_id, length, mol_env_path, esm_env_path):
         self.reactant = reactant_id

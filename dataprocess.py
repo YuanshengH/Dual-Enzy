@@ -21,7 +21,6 @@ def main(args):
         smiles_list = [j for i in reaction_list for j in i.split('>>')]
         smiles_list = [j for i in smiles_list for j in i.split('.')]
         smiles_list = list(sorted(list(set(smiles_list))))
-
         itosmiles = set()
         for s in smiles_list:
             itosmiles.add(s)
@@ -51,13 +50,11 @@ def main(args):
         df.drop_duplicates(subset=['Uniprot_ID'], inplace=True)
         df.reset_index(drop=True, inplace=True)
         print(f"Sequence number: {len(df)}")
-
         device = torch.device('cuda')
         model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
         model.to(device)
         batch_converter = alphabet.get_batch_converter()
         model.eval()
-
         lmdb_path = './data/train_data/esm_rhea.lmdb'
         env = lmdb.open(lmdb_path, map_size=2199023255556)
         with env.begin(write=True) as txn:

@@ -34,7 +34,6 @@ def main(args):
     model = EnzymaticModel(num_layers=args.num_layer, hidden_dim=args.hidden_dim, out_dim=args.output_dim)
     model = model.to(device)
 
-    # feature bank init
     model.eval()
     feats_array = np.zeros((len(train_df), args.output_dim))  
     lb_array = np.ones(len(train_df))
