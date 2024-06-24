@@ -11,7 +11,6 @@ df = pd.read_excel('/mnt/Dual_Enzy/data/aminotransferases_dataset/aminotransfera
 seq_df = pd.read_csv('/mnt/Dual_Enzy/data/aminotransferases_dataset/aminotransferase_sequence_file.txt',sep='\t')
 new_df = pd.DataFrame(columns=['Entry','Sequence','Substrate','Label'])
 aa_list = df.iloc[0,2:].tolist()
-
 for i in range(len(df)):
     if i == 0:
         continue

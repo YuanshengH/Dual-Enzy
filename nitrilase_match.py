@@ -71,6 +71,7 @@ def main(args):
     model = model.to(device)
     checkpoint = torch.load(args.ckpt, map_location=torch.device('cpu'))
     model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['model_state_dict'].items()})
+
     logger.add('./log/nitrilase.log')
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-6)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)

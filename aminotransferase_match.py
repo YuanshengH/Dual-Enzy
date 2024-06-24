@@ -54,6 +54,7 @@ def main(args):
                                 mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batchsize, collate_fn=collate_substrate, shuffle=True, num_workers=4, pin_memory=True)
 
+
     valid_dataset = SubstrateDataset(reactant_id=valid_df['reactant_id'].values.tolist(), product_id=valid_df['product_id'].values.tolist(),
                                 reaction_id=valid_df['reaction_id'].values.tolist(),uni_id=valid_df['Entry'].values.tolist(), activity=valid_df['Label'].values.tolist(),
                                 mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
