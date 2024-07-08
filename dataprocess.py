@@ -3,10 +3,8 @@ import torch
 import argparse
 import pickle
 import pandas as pd
-import numpy as np
 import esm
 from tqdm import tqdm
-from Bio import SeqIO
 from rdkit import Chem
 from unimol_tools import UniMolRepr
 from utils.build_utils import same_seed

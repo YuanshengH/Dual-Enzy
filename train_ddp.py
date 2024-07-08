@@ -62,7 +62,6 @@ def main(args):
     feature_bank = Feature_Bank(num_class=num_class, m=args.m)
     
     # scheduler
-    print("Set Scheduler")
     total_steps = (len(train_loader) * args.epoch)
     warmup_steps = math.ceil(total_steps * 0.1)
     scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=warmup_steps, num_training_steps=total_steps)
@@ -89,13 +88,11 @@ def main(args):
         wandb.define_metric("valid_rxn_loss", step_metric="mystep")
         wandb.define_metric("valid_ec_loss", step_metric="mystep")
         wandb.define_metric("valid_prototype_loss", step_metric="mystep")
-
         wandb.define_metric("val_product_mrr", step_metric="mystep")
         wandb.define_metric("val_enzyme_mrr", step_metric="mystep")
         wandb.define_metric("test_product_mrr", step_metric="mystep")
         wandb.define_metric("test_enzyme_mrr", step_metric="mystep")
         wandb.watch(models=model)
-
 
     train_global_step = 0
     valid_global_step = 0

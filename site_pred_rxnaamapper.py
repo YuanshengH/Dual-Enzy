@@ -12,7 +12,6 @@ from model.Enzymatic_reaction import EnzymaticModel
 from sklearn.metrics import confusion_matrix
 from dataset import RXNMapperDataset, collate_fn_RXNMapper
 
-
 def calculate_metrics_sklearn(y_true, y_pred):
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     fpr = fp / (fp + tn) if (fp + tn) > 0 else 0  
