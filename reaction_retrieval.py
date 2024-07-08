@@ -22,7 +22,7 @@ def main(args):
     test_path = args.test_path
     logger.add('./log/test_mrr_map.log')
     logger.info(args.checkpoint)
-    data_df = pd.read_csv('./data/evaluate/test_split/test.csv')
+    data_df = pd.read_csv('./data/test_split/test.csv')
     data_df['reactant_id'] = data_df['reactant_id'].apply(lambda x:eval(x))
     data_df['product_id'] = data_df['product_id'].apply(lambda x:eval(x))
 
@@ -70,9 +70,9 @@ def main(args):
         test_df = pd.read_csv(os.path.join(test_path, i))
         test_df['reactant_id'] = test_df['reactant_id'].apply(lambda x:eval(x))
         test_df['product_id'] = test_df['product_id'].apply(lambda x:eval(x))
-        evaluate(model, test_df, device, 'test', args, logger, product_keys, product_tensor, enzyme_keys, enzyme_tensor, ec2uni_dict)
+        evaluate(model, test_df, device, args, logger, product_keys, product_tensor, enzyme_keys, enzyme_tensor, ec2uni_dict)
 
-def evaluate(model, test_df, device, mode, args, logger, product_keys, product_tensor, enzyme_keys, enzyme_tensor, ec2uni_dict):
+def evaluate(model, test_df, device, args, logger, product_keys, product_tensor, enzyme_keys, enzyme_tensor, ec2uni_dict):
     model.eval()
     with torch.no_grad():
         all_product_embeddings = []
@@ -116,10 +116,9 @@ def evaluate(model, test_df, device, mode, args, logger, product_keys, product_t
     product_all_ranks = np.array(((sorted_indices == ground_truth).nonzero()[:, 1] + 1).tolist())
 
     product_mean_reciprocal_rank = float(np.mean(1 / product_all_ranks))
-    product_mean_rank = float(np.mean(product_all_ranks))
     product_h1 = float(np.mean(product_all_ranks<=1))
-    print('Match product:  %s  product_mr: %.4f product_mrr: %.4f product_h1: %.4f' % (mode, product_mean_rank, product_mean_reciprocal_rank,product_h1))
-    logger.info('Match product:  %s  product_mr: %.4f product_mrr: %.4f product_h1: %.4f' % (mode, product_mean_rank, product_mean_reciprocal_rank,product_h1))
+    print('Match_product_mrr: %.4f Match_product_h1: %.4f' % (product_mean_reciprocal_rank, product_h1))
+    logger.info('Match_product_mrr: %.4f Match_product_h1: %.4f' % (product_mean_reciprocal_rank, product_h1))
 
     fuse_embeddings = all_reactant_embeddings - all_product_embeddings
     dist = torch.cdist(fuse_embeddings.double(), -enzyme_tensor.double(), p=2)
@@ -140,8 +139,8 @@ def evaluate(model, test_df, device, mode, args, logger, product_keys, product_t
         ap = (np.arange(1, len(match_uni)+1) / rankings).sum() / len(match_uni)
         all_enzyme_ap.append(ap)
     enzyme_mean_average_precision = float(np.mean(all_enzyme_ap))
-    print('Match enzyme:  %s  enzyme_mean_average_precision: %.4f' % (mode, enzyme_mean_average_precision))
-    logger.info('Match enzyme:  %s  enzyme_mean_average_precision: %.4f' % (mode, enzyme_mean_average_precision))
+    print('enzyme_mean_average_precision: %.4f' % (enzyme_mean_average_precision))
+    logger.info('enzyme_mean_average_precision: %.4f' % (enzyme_mean_average_precision))
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='setting')
@@ -149,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument('--checkpoint', default='./ckpt/checkpoint.pt')
     parser.add_argument('--mol_env_path', default='./data/train_data/unimol.lmdb')
     parser.add_argument('--esm_env_path', default='./data/train_data/esm_rhea.lmdb')
-    parser.add_argument('--test_path', default='./data/evaluate/test_split')
+    parser.add_argument('--test_path', default='./data/test_split')
     parser.add_argument('--unimol_dict', default='./data/train_data/unimol_smile_dict.pk')
     parser.add_argument('--seed', default=42, type=int)
     args = parser.parse_args()
