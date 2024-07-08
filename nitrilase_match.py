@@ -7,10 +7,10 @@ import torch.optim as optim
 from loguru import logger
 from tqdm import tqdm
 from torch.utils.data import DataLoader 
+from model.Enzymatic_reaction import EnzymaticModel
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import matthews_corrcoef, roc_auc_score
 from dataset import SubstrateDataset, collate_substrate
-from model.Enzymatic_reaction import EnzymaticModel
 from utils.build_utils import same_seed
 
 def main(args):
