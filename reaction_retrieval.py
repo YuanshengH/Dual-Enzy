@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument('--mol_env_path', default='./data/train_data/unimol.lmdb')
     parser.add_argument('--esm_env_path', default='./data/train_data/esm_rhea.lmdb')
     parser.add_argument('--test_path', default='./data/evaluate/test_split')
-    parser.add_argument('--unimol_dict', default='./data/train_data/unimol_smile_dict_data.pk')
+    parser.add_argument('--unimol_dict', default='./data/train_data/unimol_smile_dict.pk')
     parser.add_argument('--seed', default=42, type=int)
     args = parser.parse_args()
     main(args)

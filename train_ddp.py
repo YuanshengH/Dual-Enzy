@@ -266,7 +266,7 @@ if __name__ == "__main__":
     parser.add_argument('--wandb_api_key', type=str, default="")
     parser.add_argument('--checkpoint', default='./ckpt')
     parser.add_argument('--data_path', default='./data/rhea_processed_data.csv')
-    parser.add_argument('--unimol_dict', default='./data/train_data/unimol_smile_dict_data.pk')
+    parser.add_argument('--unimol_dict', default='./data/train_data/unimol_smile_dict.pk')
     parser.add_argument('--mol_env_path', default='./data/train_data/unimol.lmdb')
     parser.add_argument('--esm_env_path', default='./data/train_data/esm_rhea.lmdb')
     parser.add_argument('--feat_path', default='./data/feat.npy', help="Feature bank initialized features")
