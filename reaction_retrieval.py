@@ -18,9 +18,6 @@ def main(args):
     model = EnzymaticModel()
     model = model.to(device)
     model.load_state_dict({k.replace('module.', ''): v for k, v in torch.load(args.checkpoint, map_location='cuda:0')['model_state_dict'].items()})
-    model = EnzymaticModel()
-    model = model.to(device)
-    model.load_state_dict({k.replace('module.', ''): v for k, v in torch.load(args.checkpoint, map_location='cuda:0')['model_state_dict'].items()})
 
     test_path = args.test_path
     logger.add('./log/test_mrr_map.log')
