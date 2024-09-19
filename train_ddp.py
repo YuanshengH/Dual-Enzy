@@ -55,7 +55,7 @@ def main(args):
 
     model = EnzymaticModel(num_layers=args.num_layer, hidden_dim=args.hidden_dim, out_dim=args.output_dim)
     model = model.to(device)
-    model = DDP(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
+    model = DDP(model, device_ids=[local_rank], output_device=local_rank)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-6)
     criterion = torch.nn.CrossEntropyLoss()
     num_class = len(list(set(df['EC_id'].values.tolist())))

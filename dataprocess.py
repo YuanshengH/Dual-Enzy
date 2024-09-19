@@ -97,7 +97,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--task', default='unimol', choices=['unimol','esm_extract', 'data_process'])
+    parser.add_argument('--task', default='esm_extract', choices=['unimol','esm_extract', 'data_process'])
     parser.add_argument('--data_path', default='./data/rhea_processed_data.csv')
     args = parser.parse_args()
     main(args)
