@@ -15,9 +15,9 @@ from utils.build_utils import same_seed
 def main(args):
     same_seed(42)
     device = torch.device('cuda')
-    df = pd.read_csv('./data/aminotransferases_dataset/aminotransferases_data.csv')
+    df = pd.read_csv('./data/aminotransferase_dataset/aminotransferase_data.csv')
     rxntoi = {r:idx for idx, r in enumerate(sorted(list(set(df['reaction'].values.tolist()))))}
-    with open('./data/aminotransferases_dataset/aminotransferases_reaction_dict.pk', 'rb') as f:
+    with open('./data/aminotransferase_dataset/aminotransferase_reaction_dict.pk', 'rb') as f:
         itosmiles, smilestoi = pickle.load(f)
     df['reaction_id'] = df['reaction'].apply(lambda x:rxntoi[x])
     df['reactant'] = df['reaction'].apply(lambda x:x.split('>>')[0])
@@ -51,17 +51,17 @@ def main(args):
 
     train_dataset = SubstrateDataset(reactant_id=train_df['reactant_id'].values.tolist(), product_id=train_df['product_id'].values.tolist(),
                                 reaction_id=train_df['reaction_id'].values.tolist(),uni_id=train_df['Entry'].values.tolist(), activity=train_df['Label'].values.tolist(),
-                                mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
+                                mol_env_path='./data/aminotransferase_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferase_dataset/enzyme_emb.lmdb')
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batchsize, collate_fn=collate_substrate, shuffle=True, num_workers=4, pin_memory=True)
 
     valid_dataset = SubstrateDataset(reactant_id=valid_df['reactant_id'].values.tolist(), product_id=valid_df['product_id'].values.tolist(),
                                 reaction_id=valid_df['reaction_id'].values.tolist(),uni_id=valid_df['Entry'].values.tolist(), activity=valid_df['Label'].values.tolist(),
-                                mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
+                                mol_env_path='./data/aminotransferase_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferase_dataset/enzyme_emb.lmdb')
     valid_dataloader = DataLoader(dataset=valid_dataset, batch_size=args.batchsize, collate_fn=collate_substrate)
     
     test_dataset = SubstrateDataset(reactant_id=test_df['reactant_id'].values.tolist(), product_id=test_df['product_id'].values.tolist(),
                                 reaction_id=test_df['reaction_id'].values.tolist(),uni_id=test_df['Entry'].values.tolist(), activity=test_df['Label'].values.tolist(),
-                                mol_env_path='./data/aminotransferases_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferases_dataset/enzyme_emb.lmdb')
+                                mol_env_path='./data/aminotransferase_dataset/reaction_emb.lmdb', esm_env_path='./data/aminotransferase_dataset/enzyme_emb.lmdb')
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=args.batchsize, collate_fn=collate_substrate)
 
     model = EnzymaticModel(num_layers=1, hidden_dim=1024, out_dim=512)
@@ -70,7 +70,7 @@ def main(args):
     model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['model_state_dict'].items()})
     lr = args.lr
 
-    logger.add('./log/aminotransferases.log')
+    logger.add('./log/aminotransferase.log')
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-6)
     model.to(device)
     model.train()

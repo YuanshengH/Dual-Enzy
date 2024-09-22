@@ -62,6 +62,7 @@ pip install -r requirement.txt
 python dataprocess.py --task data_process --data_path ./data/rhea_data.csv
 python dataprocess.py --task unimol --data_path ./data/rhea_processed_data.csv
 python dataprocess.py --task esm_extract --data_path ./data/rhea_processed_data.csv
+python ./feature_bank_init.py
 ```
 
 ### Training the model
@@ -71,8 +72,21 @@ torchrun --nproc_per_node {num_GPU} train_ddp.py --batch_size 64 --wandb_api_key
 
 ### Substrate prediction
 #### [1] Nitrilase substrate prediction
-To proceed with the prediction, first place the file 'nitrilase_descriptors.xlsx' into the directory './nitrilase_data'. Then execute the following commands in your terminal:
+To proceed with the prediction, first place the file `nitrilase_descriptors.xlsx` into the directory `./data/nitrilase_dataset`. Then execute the following commands in your terminal:
 ```
 python ./nitrilase_data_process.py
 python ./nitrilase_match.py
+```
+
+#### [2] Aminotransferase substrate prediction
+To proceed with the prediction, first place the file `aminotransferase_data.xlsx` into the directory `./data/aminotransferase_dataset`. Then execute the following commands in your terminal:
+```
+python ./aminotransferase_data_process.py
+python ./aminotransferase_match.py
+```
+
+### Site prediction
+To proceed with the prediction, first place the file `rxnaamapper.csv` into the directory `./data/site_pred_data`. Then execute the following commands in your terminal:
+```
+python ./site_pred_rxnaamapper.py
 ```

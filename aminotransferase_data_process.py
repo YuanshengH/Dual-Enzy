@@ -7,8 +7,8 @@ import pandas as pd
 from tqdm import tqdm
 from unimol_tools import UniMolRepr
 
-df = pd.read_excel('./data/aminotransferases_dataset/aminotransferase_data.xlsx')
-seq_df = pd.read_csv('./data/aminotransferases_dataset/aminotransferase_sequence_file.txt',sep='\t')
+df = pd.read_excel('./data/aminotransferase_dataset/aminotransferase_data.xlsx')
+seq_df = pd.read_csv('./data/aminotransferase_dataset/aminotransferase_sequence_file.txt',sep='\t')
 new_df = pd.DataFrame(columns=['Entry','Sequence','Substrate','Label'])
 aa_list = df.iloc[0,2:].tolist()
 for i in range(len(df)):
@@ -57,8 +57,8 @@ new_df['aa'] = new_df['Substrate'].apply(lambda x: aa_dict[x])
 new_df['reaction'] = new_df['aa'].apply(lambda x:reaction_dict[x])
 print()
 
-if not os.path.exists('./data/aminotransferases_dataset/enzyme_emb.lmdb'):
-    env = lmdb.open('./data/aminotransferases_dataset/enzyme_emb.lmdb', map_size=1099511627776)
+if not os.path.exists('./data/aminotransferase_dataset/enzyme_emb.lmdb'):
+    env = lmdb.open('./data/aminotransferase_dataset/enzyme_emb.lmdb', map_size=1099511627776)
     device = torch.device('cuda')
     model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
     model.to(device)
@@ -79,8 +79,8 @@ if not os.path.exists('./data/aminotransferases_dataset/enzyme_emb.lmdb'):
             txn.put(uid.encode(), pickle.dumps(token_representations))
     env.close()
 
-if not os.path.exists('./data/aminotransferases_dataset/reaction_emb.lmdb'):
-    env = lmdb.open('./data/aminotransferases_dataset/reaction_emb.lmdb', map_size=1099511627776)
+if not os.path.exists('./data/aminotransferase_dataset/reaction_emb.lmdb'):
+    env = lmdb.open('./data/aminotransferase_dataset/reaction_emb.lmdb', map_size=1099511627776)
     reaction_list = list(set(new_df['reaction'].values.tolist()))
     smiles_list = [j for i in reaction_list for j in i.split('>>')]
     smiles_list = [j for i in smiles_list for j in i.split('.')]
@@ -91,7 +91,7 @@ if not os.path.exists('./data/aminotransferases_dataset/reaction_emb.lmdb'):
         itosmiles.add(s)
     itosmiles = sorted(list(itosmiles))
     smilestoi = {itosmiles[i]:i for i in range(len(itosmiles))}
-    with open('./data/aminotransferases_dataset/aminotransferases_reaction_dict.pk', 'wb') as f:
+    with open('./data/aminotransferase_dataset/aminotransferase_reaction_dict.pk', 'wb') as f:
         pickle.dump([itosmiles,smilestoi],f)
 
     clf = UniMolRepr(data_type='molecule', remove_hs=False, use_gpu=True)
@@ -112,4 +112,4 @@ new_df = new_df[~((new_df.Entry=='P0A959') & (new_df.aa=='ala'))]
 new_df = new_df[~((new_df.Entry=='P39576') & (new_df.aa=='ile'))]
 new_df = new_df[~((new_df.Entry=='P39576') & (new_df.aa=='leu'))]
 new_df = new_df[~((new_df.Entry=='P39576') & (new_df.aa=='val'))]
-new_df.to_csv('./data/aminotransferases_dataset/aminotransferases_data.csv', index=False)
+new_df.to_csv('./data/aminotransferase_dataset/aminotransferase_data.csv', index=False)
