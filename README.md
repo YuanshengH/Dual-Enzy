@@ -14,10 +14,10 @@ Implementation of A Dual-Grained Molecular Learning Approach Integrating Knowled
 
 - [Reproduce Results](#reproduce-results)
 
-  - [Input formats](#Input-formats)
-  - [Supported residues](#supported-residues)
-  - [Docking prediction](#docking-prediction)
-  - [Visualization](#Visualization)
+  - [Data process](#data-process)
+  - [Training the model](#training-the-model)
+  - [Substrate prediction](#substrate-prediction)
+  - [Site prediction](#site-prediction)
 
 
 ## Introduction
@@ -34,8 +34,7 @@ We introduce a dual-grained , cross-modal enzymatic-reaction-aware molecular lea
 * scikit-learn (version >= 1.3.2)
 * unimol-tools(version == 1.0.0)
 * unicore(version == 0.0.1)
-* transformers
-* wandb
+* transformers(version >= 4.44.2)
 
 ## Setup Environment
 
