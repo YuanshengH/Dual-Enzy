@@ -68,3 +68,11 @@ python dataprocess.py --task esm_extract --data_path ./data/rhea_processed_data.
 ```
 torchrun --nproc_per_node {num_GPU} train_ddp.py --batch_size 64 --wandb_api_key {wandb_api_key}
 ``` 
+
+### Substrate prediction
+#### [1] Nitrilase substrate prediction
+To proceed with the prediction, first place the file 'nitrilase_descriptors.xlsx' into the directory './nitrilase_data'. Then execute the following commands in your terminal:
+```
+python ./nitrilase_data_process.py
+python ./nitrilase_match.py
+```

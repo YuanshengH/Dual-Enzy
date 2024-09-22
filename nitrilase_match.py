@@ -117,7 +117,7 @@ def main(args):
 
     max_mcc = 0
     idx = 0
-    for i in range(400):
+    for i in range(300):
         t = 0.01 * i 
         ll = [1 if i<t else 0 for i in dist]
         ll = np.array(ll)
@@ -170,12 +170,11 @@ def main(args):
     logger.info(f'Test Epoch:{args.epoch}, Lr:{args.lr}, ACC:{acc}, ROC_AUC:{roc_auc}, MCC:{mcc}, Thredhold:{thred}')
 
 def ReactionLoss(reactant_emb, enzyme_emb, product_emb, rxn_label, activity, margin1=12, margin2=3):
-    # [reactant+enzyme] <--> [product] large margin
     fuse_emb1 = reactant_emb + enzyme_emb
     dist = torch.cdist(fuse_emb1.double(), product_emb.double(), p=2)
     rxn_label = rxn_label.contiguous().view(-1, 1)
     rxn_mask = torch.eq(rxn_label, rxn_label.T).int().cuda()
-    # 由于有负样本的存在，对角线上的负样本需要转为0
+
     zero_indices = (activity==0).nonzero(as_tuple=True)[0]
     rxn_mask = rxn_mask - torch.diag(1-activity)
     rxn_mask[zero_indices] = 0
@@ -186,13 +185,11 @@ def ReactionLoss(reactant_emb, enzyme_emb, product_emb, rxn_label, activity, mar
     pos = pos.sum(dim=1)
     pos = pos[pos!=0] / pos_num
 
-    # label为0的样本，化学反应是正确的，使用小的margin2
     enzyme_mask = torch.diag(1-activity)
     enzyme_neg = enzyme_mask * dist + (1 - enzyme_mask) * margin2
     enzyme_neg = torch.relu(margin2-enzyme_neg)
     enzyme_neg = torch.sum(enzyme_neg) / torch.sum(enzyme_mask)
 
-    # 非对角线为0的样本是替换产物的样本，使用大的margin1
     reaction_mask = torch.eq(rxn_label, rxn_label.T).int().cuda()
     reaction_neg_num = (1 - reaction_mask).sum(dim=1)
     reaction_neg = (1 - reaction_mask) * dist + reaction_mask * margin1
