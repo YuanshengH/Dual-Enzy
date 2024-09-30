@@ -55,6 +55,9 @@ pip install -r requirement.txt
 
 ## Reproduce Results
 
+### Data Download
+Before reproducing the results, please download the model checkpoint and data. You can find them [here](https://drive.google.com/file/d/1o-i4cl2u5j6cL5RDbutAeoQTuZxpD6ND/view?usp=sharing "download").
+
 ### Data process
 
 ```
@@ -69,16 +72,22 @@ python ./feature_bank_init.py
 torchrun --nproc_per_node {num_GPU} train_ddp.py --batch_size 64 --wandb_api_key {wandb_api_key}
 ``` 
 
+### Reaction Retrieval
+To evaluate reaction retrieval task, execute the following commands in your terminal:
+```
+python ./reaction_retrieval.py
+```
+
 ### Substrate prediction
 #### [1] Nitrilase substrate prediction
-To proceed with the prediction, first place the file `nitrilase_descriptors.xlsx` into the directory `./data/nitrilase_dataset`. Then execute the following commands in your terminal:
+To proceed with the prediction, first place the file `nitrilase_data.csv` into the directory `./data/nitrilase_dataset`. Then execute the following commands in your terminal:
 ```
 python ./nitrilase_data_process.py
 python ./nitrilase_match.py
 ```
 
 #### [2] Aminotransferase substrate prediction
-To proceed with the prediction, first place the file `aminotransferase_data.xlsx` into the directory `./data/aminotransferase_dataset`. Then execute the following commands in your terminal:
+To proceed with the prediction, first place the file `aminotransferase_data.csv` and `aminotransferase_sequence_file.txt` into the directory `./data/aminotransferase_dataset`. Then execute the following commands in your terminal:
 ```
 python ./aminotransferase_data_process.py
 python ./aminotransferase_match.py

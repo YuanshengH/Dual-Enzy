@@ -22,46 +22,6 @@ def main(args):
     test_path = args.test_path
     logger.add('./log/test_mrr_map.log')
     logger.info(args.checkpoint)
-    data_df = pd.read_csv('./data/test_split/test.csv')
-    data_df['reactant_id'] = data_df['reactant_id'].apply(lambda x:eval(x))
-    data_df['product_id'] = data_df['product_id'].apply(lambda x:eval(x))
-
-    model.eval()
-    with torch.no_grad():
-        eval_dataset = EvalDataset(reactant_id=data_df['reactant_id'].values.tolist(), product_id=data_df['product_id'].values.tolist(),
-                                     reaction_id=data_df['reaction_id'].values.tolist(), ec=data_df['EC_id'].values.tolist(),
-                                      uni_id=data_df['Uniprot_ID'].values.tolist(), mol_env_path=args.mol_env_path, esm_env_path=args.esm_env_path)
-        eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, collate_fn=collate_fn_eval, num_workers=8, shuffle=False)
-
-        ec2uni_dict = {}
-        for ec,uid in zip(data_df['EC_id'].values.tolist(), data_df['Uniprot_ID'].values.tolist()):
-            if ec not in ec2uni_dict.keys():
-                ec2uni_dict[ec] = set()
-                ec2uni_dict[ec].add(uid)
-            else:
-                ec2uni_dict[ec].add(uid)
-
-        product_dict = {}
-        enzyme_dict = {}
-
-        for batch in tqdm(eval_dataloader, desc='eval'):
-            r_embedding, p_embedding, esm_embedding, r_padding_mask, p_padding_mask, esm_padding_mask, reaction_id, ec, reactant_id, product_id, uni_id = batch
-            r_embedding, p_embedding, esm_embedding, r_padding_mask, p_padding_mask, esm_padding_mask = r_embedding.to(device), p_embedding.to(device), esm_embedding.to(device),\
-                                                                        r_padding_mask.to(device), p_padding_mask.to(device), esm_padding_mask.to(device)
-            reaction_id, ec = reaction_id.to(device), ec.to(device)
-            reactant_emb, enzyme_emb, product_emb = model(esm_emb=esm_embedding, reactant=r_embedding, product=p_embedding, 
-                                                        esm_padding_mask=esm_padding_mask, reactant_padding_mask=r_padding_mask, product_padding_mask=p_padding_mask)
-
-            for i in range(enzyme_emb.size(0)):
-                if str(product_id[i]) not in product_dict.keys():
-                    product_dict[str(product_id[i])] = product_emb[i]
-                if uni_id[i] not in enzyme_dict.keys():
-                    enzyme_dict[uni_id[i]] = enzyme_emb[i]
-
-        product_keys = list(product_dict.keys())
-        product_tensor = torch.stack(list(product_dict.values()), dim=0).cpu()
-        enzyme_keys = list(enzyme_dict.keys())
-        enzyme_tensor = torch.stack(list(enzyme_dict.values()), dim=0).cpu()
 
     for i in os.listdir(test_path):     
         if i[-3:] != 'csv':
@@ -70,9 +30,17 @@ def main(args):
         test_df = pd.read_csv(os.path.join(test_path, i))
         test_df['reactant_id'] = test_df['reactant_id'].apply(lambda x:eval(x))
         test_df['product_id'] = test_df['product_id'].apply(lambda x:eval(x))
-        evaluate(model, test_df, device, args, logger, product_keys, product_tensor, enzyme_keys, enzyme_tensor, ec2uni_dict)
+        evaluate(model, test_df, device, args, logger)
 
-def evaluate(model, test_df, device, args, logger, product_keys, product_tensor, enzyme_keys, enzyme_tensor, ec2uni_dict):
+def evaluate(model, test_df, device, args, logger):
+    ec2uni_dict = {}
+    for ec,uid in zip(test_df['EC_id'].values.tolist(), test_df['Uniprot_ID'].values.tolist()):
+        if ec not in ec2uni_dict.keys():
+            ec2uni_dict[ec] = set()
+            ec2uni_dict[ec].add(uid)
+        else:
+            ec2uni_dict[ec].add(uid)
+
     model.eval()
     with torch.no_grad():
         all_product_embeddings = []
@@ -81,6 +49,8 @@ def evaluate(model, test_df, device, args, logger, product_keys, product_tensor,
         all_ec = []
         all_product_id = []
         all_reaction_id = []
+        product_dict = {}
+        enzyme_dict = {}
         test_dataset = EvalDataset(reactant_id=test_df['reactant_id'].values.tolist(), product_id=test_df['product_id'].values.tolist(),
                                      reaction_id=test_df['reaction_id'].values.tolist(), ec=test_df['EC_id'].values.tolist(),
                                       uni_id=test_df['Uniprot_ID'].values.tolist(), mol_env_path=args.mol_env_path, esm_env_path=args.esm_env_path)
@@ -102,6 +72,17 @@ def evaluate(model, test_df, device, args, logger, product_keys, product_tensor,
 
             for p_id in product_id:
                 all_product_id.append(str(p_id))
+
+            for i in range(enzyme_emb.size(0)):
+                if str(product_id[i]) not in product_dict.keys():
+                    product_dict[str(product_id[i])] = product_emb[i]
+                if uni_id[i] not in enzyme_dict.keys():
+                    enzyme_dict[uni_id[i]] = enzyme_emb[i]
+                    
+    product_keys = list(product_dict.keys())
+    product_tensor = torch.stack(list(product_dict.values()), dim=0).cpu()
+    enzyme_keys = list(enzyme_dict.keys())
+    enzyme_tensor = torch.stack(list(enzyme_dict.values()), dim=0).cpu()    
 
     all_ec = torch.cat(all_ec, dim=0)
     all_reaction_id = torch.cat(all_reaction_id, dim=0)
