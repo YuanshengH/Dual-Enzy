@@ -1,6 +1,6 @@
-# Dual-Grained Cross-Modal Molecular Representation Learning for Enzymatic Reaction Modeling
+# ERAM: A Unified Dual-Grained Cross-Modal Molecular Representation Learning Framework for Enzymatic Reaction Modeling
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) <br>
-Implementation of A Dual-Grained Molecular Learning Approach Integrating Knowledge Graphs and Contrastive Learning<br>
+Implementation of ERAM: A Unified Dual-Grained Cross-Modal Molecular Representation Learning Framework for Enzymatic Reaction Modeling<br>
 ![model_overview](./figure/model_overview.png)
 
 
@@ -22,7 +22,7 @@ Implementation of A Dual-Grained Molecular Learning Approach Integrating Knowled
 
 ## Introduction
 
-We introduce a dual-grained , cross-modal enzymatic-reaction-aware molecular learning method named ERAM which is capable of (i) simultaneously predicting the feasibility and the ideal enzymes for a given reaction (and vice versa), by a dual-grained contrastive learning scheme, (ii) capturing the catalytic interactions between the substrates and the enzyme via a joint cross-modal modeling of their individual representations.
+We introduce a dual-grained , cross-modal enzymatic-reaction-aware molecular learning method named ERAM which is capable of  (i) jointly modeling small-molecules and enzymes in a unified embedding space, (ii) simultaneously predicting the feasibility and the ideal enzymes for a given reaction (and vice versa), by a dual-grained contrastive learning scheme, (iii) capturing the catalytic interactions between the substrates and the enzyme via a cross-modal information fusion of their individual representations.
 
 ## Prerequisites
 * Python (version >= 3.10) 
