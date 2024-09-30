@@ -56,7 +56,7 @@ pip install -r requirement.txt
 ## Reproduce Results
 
 ### Data Download
-Before reproducing the results, please download the model checkpoint and data. You can find them [here](https://drive.google.com/file/d/1o-i4cl2u5j6cL5RDbutAeoQTuZxpD6ND/view?usp=sharing "download").
+Before reproducing the results, please download the model checkpoint and data. You can find them [here](https://drive.google.com/file/d/1o-i4cl2u5j6cL5RDbutAeoQTuZxpD6ND/view?usp=sharing "download"). After downloading, replace the contents of the `data`and `ckpt` directories.
 
 ### Data process
 
@@ -69,7 +69,7 @@ python ./feature_bank_init.py
 
 ### Training the model
 ```
-torchrun --nproc_per_node {num_GPU} train_ddp.py --batch_size 64 --wandb_api_key {wandb_api_key}
+torchrun --nproc_per_node {num_GPU} train_ddp.py --batch_size 64
 ``` 
 
 ### Reaction Retrieval
