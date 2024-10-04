@@ -1,8 +1,12 @@
 import argparse
 import os
 import torch
+import lmdb
+import esm
+import pickle
 import pandas as pd
 import numpy as np
+from unimol_tools import UniMolRepr
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from loguru import logger
@@ -22,6 +26,62 @@ def main(args):
     test_path = args.test_path
     logger.add('./log/test_mrr_map.log')
     logger.info(args.checkpoint)
+
+    if not os.path.exists('./data/test_split/enzyme_emb.lmdb'):
+        df = pd.read_csv('./data/test_split/test.csv')
+        df.drop_duplicates(subset=['Uniprot_ID'], inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        print(f"Sequence number: {len(df)}")
+        device = torch.device('cuda')
+        model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
+        model.to(device)
+        batch_converter = alphabet.get_batch_converter()
+        model.eval()
+        lmdb_path = './data/test_split/enzyme_emb.lmdb'
+        env = lmdb.open(lmdb_path, map_size=2199023255556)
+        with env.begin(write=True) as txn:
+            for j in tqdm(range(len(df))):
+                enzyme = df['Uniprot_ID'][j]
+                sequence = df['Sequence'][j]
+                data = [(enzyme, sequence)]
+                batch_labels, batch_strs, batch_tokens = batch_converter(data)
+                batch_tokens = batch_tokens.to(device)
+                with torch.no_grad():
+                    results = model(batch_tokens, repr_layers=[33], return_contacts=False)
+                token_representations = results["representations"][33].squeeze(0)
+                token_representations = token_representations.cpu()
+                txn.put(enzyme.encode(), pickle.dumps(token_representations))
+        env.close()
+
+    if not os.path.exists('./data/test_split/reaction_emb.lmdb'):
+        clf = UniMolRepr(data_type='molecule', remove_hs=False, use_gpu=True)
+        df = pd.read_csv('./data/test_split/test.csv')
+        reaction_list = list(set(df['reaction'].values.tolist()))
+        smiles_list = [j for i in reaction_list for j in i.split('>>')]
+        smiles_list = [j for i in smiles_list for j in i.split('.')]
+        smiles_list = list(sorted(list(set(smiles_list))))
+        itosmiles = set()
+        for s in smiles_list:
+            itosmiles.add(s)
+        itosmiles = sorted(list(itosmiles))
+        smilestoi = {itosmiles[i]:i for i in range(len(itosmiles))}
+        with open('./data/test_split/unimol_smile_dict.pk', 'wb') as f:
+            pickle.dump([itosmiles,smilestoi],f)
+
+        batchsize = 64
+        env = lmdb.open('./data/test_split/reaction_emb.lmdb', map_size=2199023255556)
+        with env.begin(write=True) as txn:
+            for i in tqdm(range(len(smiles_list)//batchsize + 1)):
+                input_smiles = smiles_list[i*batchsize : min((i+1)*batchsize, len(smiles_list))]
+                idx_list = [smilestoi[i] for i in input_smiles] 
+                reprs = clf.get_repr(input_smiles, return_atomic_reprs=True)
+                cls_repr_tensor = torch.tensor(reprs['cls_repr'])
+                for j in range(len(reprs['atomic_reprs'])):
+                    atom_repr_tensor = torch.tensor(reprs['atomic_reprs'][j])
+                    result_tensor = torch.cat([cls_repr_tensor[j].unsqueeze(0), atom_repr_tensor], dim=0)
+                    idx = idx_list[j]
+                    txn.put(str(idx).encode(), pickle.dumps(result_tensor))
+        env.close()
 
     for i in os.listdir(test_path):     
         if i[-3:] != 'csv':
@@ -51,6 +111,13 @@ def evaluate(model, test_df, device, args, logger):
         all_reaction_id = []
         product_dict = {}
         enzyme_dict = {}
+
+        with open('./data/test_split/unimol_smile_dict.pk', 'rb') as f:
+            itosmiles, smilestoi = pickle.load(f)
+
+        test_df['reactant_id'] = test_df['reactant'].apply(lambda x: [smilestoi[i] for i in x.split('.')])
+        test_df['product_id'] = test_df['product'].apply(lambda x: [smilestoi[i] for i in x.split('.')])
+        
         test_dataset = EvalDataset(reactant_id=test_df['reactant_id'].values.tolist(), product_id=test_df['product_id'].values.tolist(),
                                      reaction_id=test_df['reaction_id'].values.tolist(), ec=test_df['EC_id'].values.tolist(),
                                       uni_id=test_df['Uniprot_ID'].values.tolist(), mol_env_path=args.mol_env_path, esm_env_path=args.esm_env_path)
@@ -78,7 +145,7 @@ def evaluate(model, test_df, device, args, logger):
                     product_dict[str(product_id[i])] = product_emb[i]
                 if uni_id[i] not in enzyme_dict.keys():
                     enzyme_dict[uni_id[i]] = enzyme_emb[i]
-                    
+
     product_keys = list(product_dict.keys())
     product_tensor = torch.stack(list(product_dict.values()), dim=0).cpu()
     enzyme_keys = list(enzyme_dict.keys())
@@ -127,10 +194,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='setting')
     parser.add_argument('--batch_size', default=64, type=int)
     parser.add_argument('--checkpoint', default='./ckpt/checkpoint.pt')
-    parser.add_argument('--mol_env_path', default='./data/train_data/unimol.lmdb')
-    parser.add_argument('--esm_env_path', default='./data/train_data/esm_rhea.lmdb')
+    parser.add_argument('--mol_env_path', default='./data/test_split/reaction_emb.lmdb')
+    parser.add_argument('--esm_env_path', default='./data/test_split/enzyme_emb.lmdb')
     parser.add_argument('--test_path', default='./data/test_split')
-    parser.add_argument('--unimol_dict', default='./data/train_data/unimol_smile_dict.pk')
+    parser.add_argument('--unimol_dict', default='./data/test_split/unimol_smile_dict.pk')
     parser.add_argument('--seed', default=42, type=int)
     args = parser.parse_args()
     main(args)
