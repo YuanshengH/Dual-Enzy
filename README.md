@@ -80,10 +80,10 @@ python ./reaction_retrieval.py
 
 ### Substrate prediction
 #### [1] Nitrilase substrate prediction
-To proceed with the prediction, first place the file `nitrilase_data.csv` into the directory `./data/nitrilase_dataset`. Then execute the following commands in your terminal:
+To proceed with the prediction, make sure the `data` and `ckpt` in the directory. Use `--split_method` to control the dataset split methed, then execute the following commands in your terminal:
 ```
 python ./nitrilase_data_process.py
-python ./nitrilase_match.py
+python ./nitrilase_match.py --split_method {random/enzyme/substrate}
 ```
 
 #### [2] Aminotransferase substrate prediction

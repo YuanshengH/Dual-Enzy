@@ -146,7 +146,7 @@ def main(args):
     print(f'MCC:{mcc}')
     roc_auc = roc_auc_score(label, 1/dist)
     print(f'ROC_AUC:{roc_auc}')
-    logger.info(f'Test Epoch:{args.epoch}, Lr:{args.lr}, ACC:{acc}, ROC_AUC:{roc_auc}, MCC:{mcc}, Thredhold:{thred}')
+    logger.info(f'ACC:{acc}, ROC_AUC:{roc_auc}, MCC:{mcc}, Thredhold:{thred}')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='setting')
