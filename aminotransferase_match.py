@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument('--split_method', default='substrate', type=str, choices=['random', 'enzyme', 'substrate'])
     parser.add_argument('--batchsize', type=int, default=512)
     parser.add_argument('--seed', default=42, type=int)
-    parser.add_argument('--ckpt', default='/home/yuansheng/Dual-Enzy/ckpt', type=str)
+    parser.add_argument('--ckpt', default='./ckpt', type=str)
     parser.add_argument('--log_path', default='./log/aminotransferase.log', type=str)
     args = parser.parse_args()
     main(args)
