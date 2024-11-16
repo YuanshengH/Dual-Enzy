@@ -87,7 +87,7 @@ python ./nitrilase_match.py --split_method {random/enzyme/substrate}
 ```
 
 #### [2] Aminotransferase substrate prediction
-To proceed with the prediction, first place the file `aminotransferase_data.csv` and `aminotransferase_sequence_file.txt` into the directory `./data/aminotransferase_dataset`. Then execute the following commands in your terminal:
+To proceed with the prediction, make sure the `data` and `ckpt` in the directory. Use `--split_method` to control the dataset split methed, then execute the following commands in your terminal:
 ```
 python ./aminotransferase_data_process.py
 python ./aminotransferase_match.py
