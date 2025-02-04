@@ -6,6 +6,7 @@ import esm
 import pickle
 import pandas as pd
 import numpy as np
+from collections import defaultdict
 from unimol_tools import UniMolRepr
 from tqdm import tqdm
 from torch.utils.data import DataLoader
@@ -93,13 +94,9 @@ def main(args):
         evaluate(model, test_df, device, args, logger)
 
 def evaluate(model, test_df, device, args, logger):
-    ec2uni_dict = {}
-    for ec,uid in zip(test_df['EC_id'].values.tolist(), test_df['Uniprot_ID'].values.tolist()):
-        if ec not in ec2uni_dict.keys():
-            ec2uni_dict[ec] = set()
-            ec2uni_dict[ec].add(uid)
-        else:
-            ec2uni_dict[ec].add(uid)
+    ec2uni_dict = defaultdict(set)
+    for ec, uid in zip(test_df['EC_id'].values.tolist(), test_df['Uniprot_ID'].values.tolist()):
+        ec2uni_dict[ec].add(uid)
 
     model.eval()
     with torch.no_grad():
@@ -177,7 +174,7 @@ def evaluate(model, test_df, device, args, logger):
     searched_reaction = set()
     for idx, data in tqdm(enumerate(zip(all_ec, all_reaction_id)), desc='enzyme mrr:'):
         ec, rid = data
-        if rid.item() not in searched_reaction:
+        if rid.item() not in searched_reaction:     # 一个化学反应只计算一次（fuse_embedding相同）
             searched_reaction.add(rid.item())
         else:
             continue
