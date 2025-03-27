@@ -1,6 +1,6 @@
-# ERAM: A Unified Dual-Grained Cross-Modal Molecular Representation Learning Framework for Enzymatic Reaction Modeling
+# Accurate and Task-Agnostic Modeling of Enzymatic Reactions through Multimodal Relational Learning
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) <br>
-Implementation of ERAM: A Unified Dual-Grained Cross-Modal Molecular Representation Learning Framework for Enzymatic Reaction Modeling<br>
+Implementation of Accurate and Task-Agnostic Modeling of Enzymatic Reactions through Multimodal Relational Learning<br>
 ![model_overview](./figure/model_overview.png)
 
 
