@@ -73,7 +73,7 @@ def main(args):
     dist.barrier()
 
     # wandb setting
-    if local_rank == 0:
+    if local_rank == 0 and args.wandb_api_key:
         wandb_name = 'train'
         logger.add('./log/training_log_{time}.log')
         wandb.init(config=args, project='Enzymatic reaction', name=wandb_name)
@@ -135,7 +135,7 @@ def main(args):
             optimizer.step()
             scheduler.step()
 
-            if local_rank == 0:
+            if local_rank == 0 and args.wandb_api_key:
                 wandb.log({'mystep':train_global_step, 'total_train_loss':loss.item(), 'reaction_loss':reaction_loss.item(), 
                            'rxn_loss':rxn_loss.item(), 'ec_loss':ec_loss.item(), 'prototype_loss': prototype_loss.item()})
             
@@ -177,7 +177,7 @@ def main(args):
                 valid_ec_losses.update(valid_ec_loss.item(), ec.size(0))
                 valid_prototype_losses.update(valid_prototype_loss.item(), ec.size(0))
 
-        if local_rank == 0:
+        if local_rank == 0 and args.wandb_api_key:
             valid_total_loss = valid_reaction_losses.avg + valid_rxn_losses.avg + valid_ec_losses.avg + valid_prototype_losses.avg
             wandb.log({'mystep':valid_global_step, 'total_valid_loss':valid_total_loss, 'valid_reaction_loss':valid_reaction_losses.avg, \
                     'valid_rxn_loss':valid_rxn_losses.avg, 'valid_ec_loss':valid_ec_losses.avg, 'valid_prototype_loss':valid_prototype_losses.avg})
