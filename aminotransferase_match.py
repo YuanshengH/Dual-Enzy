@@ -105,14 +105,10 @@ def main(args):
         if mcc>max_mcc:
             max_mcc = mcc
             idx=i 
-    print(f"max mcc:{max_mcc}")
-    print(f"thredhold:{idx}") 
 
     pred_label = np.array([1 if i<0.01*idx else 0 for i in dist])
     acc = np.mean((label==pred_label))
-    print(f"acc:{acc}")
     roc_auc = roc_auc_score(label, 1/dist)
-    print(f'ROC_AUC:{roc_auc}')
     thred = 0.01*idx
 
     dist_list = []

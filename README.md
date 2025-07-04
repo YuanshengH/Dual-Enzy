@@ -45,12 +45,19 @@ git clone https://github.com/YuanshengH/Dual-Enzy.git
 ```
 
 ### Install the environment
-
+To set up the environment manually, run the following commands:
 ```
 conda create -n ERAM python=3.10
 conda activate ERAM
 cd Dual-Enzy
-pip install -r requirement.txt
+pip install -r requirements.txt
+```
+
+Alternatively, you can download the pre-configured conda environment [here](https://drive.google.com/file/d/1lJmY1akkfrQGpb_ck-P8G0jzHjXcSFJZ/view?usp=sharing "download env"). After downloading, extract and load the environment with:
+```
+mkdir -p py310
+tar -xzf py310_0304.tar.gz -C py310
+source py310/bin/activate
 ```
 
 ## Reproduce Results
@@ -90,7 +97,7 @@ python ./nitrilase_match.py --split_method {random/enzyme/substrate}
 To proceed with the prediction, make sure the `data` and `ckpt` in the directory. Use `--split_method` to control the dataset split methed, then execute the following commands in your terminal:
 ```
 python ./aminotransferase_data_process.py
-python ./aminotransferase_match.py
+python ./aminotransferase_match.py --split_method {random/enzyme/substrate}
 ```
 
 ### Site prediction

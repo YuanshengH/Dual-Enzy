@@ -34,10 +34,10 @@ def main(args):
         df.reset_index(drop=True, inplace=True)
         print(f"Sequence number: {len(df)}")
         device = torch.device('cuda')
-        model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
-        model.to(device)
+        esm_model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
+        esm_model.to(device)
         batch_converter = alphabet.get_batch_converter()
-        model.eval()
+        esm_model.eval()
         lmdb_path = './data/test_split/enzyme_emb.lmdb'
         env = lmdb.open(lmdb_path, map_size=2199023255556)
         with env.begin(write=True) as txn:
@@ -48,7 +48,7 @@ def main(args):
                 batch_labels, batch_strs, batch_tokens = batch_converter(data)
                 batch_tokens = batch_tokens.to(device)
                 with torch.no_grad():
-                    results = model(batch_tokens, repr_layers=[33], return_contacts=False)
+                    results = esm_model(batch_tokens, repr_layers=[33], return_contacts=False)
                 token_representations = results["representations"][33].squeeze(0)
                 token_representations = token_representations.cpu()
                 txn.put(enzyme.encode(), pickle.dumps(token_representations))
