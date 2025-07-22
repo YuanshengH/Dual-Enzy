@@ -100,6 +100,20 @@ python ./aminotransferase_data_process.py
 python ./aminotransferase_match.py --split_method {random/enzyme/substrate}
 ```
 
+#### [3] DUF substrate prediction
+To proceed with the prediction, make sure the `data` and `ckpt` in the directory. Use `--split_method` to control the dataset split methed, then execute the following commands in your terminal:
+```
+python ./DUF_data_process.py
+python ./DUF_match.py --split_method {random/enzyme/substrate}
+```
+
+#### [4] OleA substrate prediction
+To proceed with the prediction, make sure the `data` and `ckpt` in the directory. Use `--split_method` to control the dataset split methed, then execute the following commands in your terminal:
+```
+python ./OleA_data_process.py
+python ./OleA_match.py --split_method {random/enzyme/substrate}
+```
+
 ### Site prediction
 To proceed with the prediction, first place the file `rxnaamapper.csv` into the directory `./data/site_pred_data`. Then execute the following commands in your terminal:
 ```
