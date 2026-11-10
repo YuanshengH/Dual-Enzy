@@ -33,7 +33,7 @@ nvidia-nccl-cu11==2.14.3
 nvidia-nvtx-cu11==11.7.91
 packaging==24.1
 pandas==1.5.3
-pillow==10.4.0
+pillow==13.0.0
 platformdirs==4.3.6
 protobuf==5.28.2
 psutil==6.0.0
