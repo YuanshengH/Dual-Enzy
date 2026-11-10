@@ -53,7 +53,7 @@ smmap==5.0.1
 sympy==1.13.3
 threadpoolctl==3.5.0
 tokenizers==0.19.1
-torch==2.0.1
+torch==2.13.0
 torchaudio==2.0.2
 torchvision==0.15.2
 tqdm==4.66.5
